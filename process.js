@@ -5,18 +5,24 @@ const path = require('path');
 const { execSync } = require('child_process');
 const glob = require('glob');
 
-const TARGET_ROOT = path.join(__dirname, 'sample'); // ← 여기에 MRI 폴더들 복사해두면 됨
+const TARGET_ROOT = path.join(__dirname, 'images'); // ← 여기에 MRI 폴더들 복사해두면 됨
+
+// const TARGET_FOLDER = path.join(__dirname, 'images', '1-01-025-MRI-0254-250131' ); // ← 여기에 MRI 폴더들 복사해두면 됨
 
 // 공백 제거 및 PNG 변환용 함수
 function normalizeAndConvertImages(folderPath) {
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.jpg'));
 
     files.forEach((file) => {
+        if (file.includes('_main')) {
+            // main 이미지는 건너뜀
+            return;
+        }
+
         const originalPath = path.join(folderPath, file);
         const normalizedName = file.replace(/\s+/g, '_').replace('.jpg', '.png');
         const targetPath = path.join(folderPath, normalizedName);
 
-        // convert 명령어로 PNG 변환 + 흰 배경 투명화
         try {
             execSync(`convert "${originalPath}" -fuzz 10% -transparent white "${targetPath}"`);
             console.log(`✅ Converted: ${file} → ${normalizedName}`);
@@ -26,10 +32,11 @@ function normalizeAndConvertImages(folderPath) {
     });
 }
 
+
 // meta.json 생성 함수
 function createMetaJson(folderPath) {
     const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.png'));
-    const baseImage = files.find(f => f.includes('_main'));
+    const baseImage = fs.readdirSync(folderPath).find(f => f.includes('_main') && f.endsWith('.jpg'));
 
     const masks = files
         .filter(f => !f.includes('_main'))
@@ -63,5 +70,13 @@ function run() {
 
     console.log('\n🎉 All done!');
 }
+
+// // 단일 폴더 테스트 실행
+// function run() {
+//     console.log(`\n📂 Processing single folder: ${TARGET_FOLDER}`);
+//     normalizeAndConvertImages(TARGET_FOLDER);
+//     createMetaJson(TARGET_FOLDER);
+//     console.log('\n🎉 Done!');
+// }
 
 run();
