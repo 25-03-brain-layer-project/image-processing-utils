@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Dependency locks
+package-lock.json
+
+# IDE configs
+.idea/
+*.iml
+
+# macOS system files
+.DS_Store
+
+# Output images (선택 - 변환된 결과 저장할 경로가 있다면)
+output/
+converted/
+temp/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+images
